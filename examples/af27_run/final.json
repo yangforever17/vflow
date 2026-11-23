@@ -1,0 +1,32 @@
+{
+ "candidates": [
+  {
+   "round": 14,
+   "score": 0.833,
+   "pass_rate": 0.8397,
+   "avg_tokens": 4498.7,
+   "avg_latency": 87.52
+  },
+  {
+   "round": 31,
+   "score": 0.8253,
+   "pass_rate": 0.8333,
+   "avg_tokens": 5381.1,
+   "avg_latency": 128.62
+  },
+  {
+   "round": 27,
+   "score": 0.8508,
+   "pass_rate": 0.859,
+   "avg_tokens": 5455.0,
+   "avg_latency": 117.2
+  }
+ ],
+ "selected": {
+  "round": 27,
+  "score": 0.8508,
+  "pass_rate": 0.859,
+  "avg_tokens": 5455.0,
+  "avg_latency": 117.2
+ }
+}

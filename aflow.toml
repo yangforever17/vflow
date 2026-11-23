@@ -1,0 +1,43 @@
+# ============================================================================
+#  模型配置：一般只需要改下面三行
+# ============================================================================
+# 模型的格式都是 "服务商/模型"，服务商在本文件下半部分的 [providers] 里定义。
+# 也可以在命令行临时覆盖：--executor ... --optimizer ... --harness ...
+
+executor  = "local/qwen3.8-27b-fp8"   # 执行器：workflow 里调用、真正写 Verilog 的模型
+optimizer = ""                        # 优化器：修改 workflow 代码的模型，如 "deepseek/deepseek-flash"
+                                      #   只写模型名（如 "gpt-5.5"）或留空 = 用 harness 自己的登录和默认模型
+harness   = "codex"                   # 驱动优化器的编程 agent：codex（Codex CLI）或 dsh（DeepSeek Harness）
+                                      #   两者都能接任意服务商；codex 要求服务商提供 Responses 接口
+# 上面是 af27 的配置：本地 Qwen 写 Verilog，codex 用自己的登录改 workflow。
+
+
+# ============================================================================
+#  服务商：地址和 key（key 本身不写在这里，写在 api_key_env 指定的环境变量里）
+# ============================================================================
+[providers.local]                  # 本地 vLLM（scripts/serve_vllm.sh 启动的那个）
+base_url = ["http://127.0.0.1:8000/v1"]   # 多个副本就多写几个地址，请求会自动分摊
+concurrency = 96                   # 每个地址同时发出的请求数
+responses_api = true
+
+[providers.openai]
+base_url = "https://api.openai.com/v1"
+api_key_env = "OPENAI_API_KEY"
+responses_api = true
+
+[providers.deepseek]
+base_url = "https://api.deepseek.com/v1"
+api_key_env = "DEEPSEEK_API_KEY"
+think_model = "deepseek-reasoner"  # 执行器 think=True 时换用的模型
+
+# 其他 OpenAI 兼容服务照抄一段即可，例如：
+# [providers.myapi]
+# base_url = "https://my-gateway.example/v1"
+# api_key_env = "MYAPI_KEY"
+# 然后写 executor = "myapi/<模型名>"
+
+# 每个服务商还可以加这些可选项：
+#   concurrency  同时发出的请求数（API 默认 16，碰到限流就调小）
+#   max_tokens   每次回复的 token 上限（默认 6144，推理模型可以调大）
+#   think_effort OpenAI 推理模型 think=True 时用的 reasoning_effort（默认 medium）
+#   responses_api 是否提供 OpenAI Responses 接口（默认 false；codex 当 harness 时需要）

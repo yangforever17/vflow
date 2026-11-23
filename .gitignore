@@ -1,0 +1,10 @@
+scripts/env.sh
+runs/
+logs/
+tmp/
+data/verilog-eval/
+data/RTLLM/
+data/fbsel_*.json
+__pycache__/
+.venv/
+.DS_Store

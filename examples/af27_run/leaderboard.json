@@ -1,0 +1,517 @@
+[
+ {
+  "round": 1,
+  "parent": null,
+  "score": 0.5561,
+  "pass_rate": 0.5577,
+  "avg_tokens": 1030.4,
+  "avg_latency": 23.73,
+  "avg_calls": 1,
+  "status": {
+   "pass": 58,
+   "compile": 23,
+   "mismatch": 15,
+   "syntax": 8
+  },
+  "modification": "initial workflow (io_staged)"
+ },
+ {
+  "round": 2,
+  "parent": 1,
+  "score": 0.3839,
+  "pass_rate": 0.3846,
+  "avg_tokens": 508.3,
+  "avg_latency": 12.93,
+  "avg_calls": 1,
+  "status": {
+   "pass": 40,
+   "compile": 45,
+   "mismatch": 17,
+   "syntax": 2
+  },
+  "optimizer_minutes": 1.7,
+  "modification": "Changed only the generation prompt to request complete code without prose, comments, or padded formatting.\nThe parent already makes one non-thinking call; reducing generated presentation tokens targets both token cost and decoding latency.\nGeneration settings and the full output budget remain unchanged to avoid truncating larger implementations.\nThree-problem smoke test: 3/3 passed, 240.3 average total tokens, 0.83s average latency; this does not establish a full-split improvement."
+ },
+ {
+  "round": 3,
+  "parent": 1,
+  "score": 0.7765,
+  "pass_rate": 0.7788,
+  "avg_tokens": 1595.3,
+  "avg_latency": 32.99,
+  "avg_calls": 1.31,
+  "status": {
+   "pass": 81,
+   "mismatch": 18,
+   "compile": 3,
+   "syntax": 2
+  },
+  "optimizer_minutes": 1.3,
+  "modification": "Added a compiler-gated repair loop after the unchanged single-candidate generation.\nOnly failed compilation triggers an LLM repair using compiler diagnostics; every revision is rechecked, with at most two repairs and early exit on repeated code.\nThis targets the parent's frequent compile/syntax failures without spending repair tokens or changing RTL on candidates that already compile.\nBounded operator timeouts and exception fallback retain the latest candidate if verification or repair is unavai"
+ },
+ {
+  "round": 4,
+  "parent": 3,
+  "score": 0.82,
+  "pass_rate": 0.8269,
+  "avg_tokens": 4595.1,
+  "avg_latency": 119.11,
+  "avg_calls": 1.43,
+  "status": {
+   "pass": 86,
+   "mismatch": 14,
+   "compile": 3,
+   "syntax": 1
+  },
+  "optimizer_minutes": 1.1,
+  "modification": "Enabled `think=True` for the single initial generation call; kept the prompt, sampling count, temperature, and compiler-gated repair loop unchanged.\nMost remaining parent failures are functional mismatches, so reasoning before emitting RTL should help check timing, state transitions, and truth-table interpretation that compiler feedback cannot validate.\nThe expected correctness gain must outweigh the additional reasoning-token cost in the objective."
+ },
+ {
+  "round": 5,
+  "parent": 3,
+  "score": 0.7573,
+  "pass_rate": 0.7596,
+  "avg_tokens": 1527.9,
+  "avg_latency": 156.55,
+  "avg_calls": 1.25,
+  "status": {
+   "pass": 79,
+   "mismatch": 23,
+   "compile": 1,
+   "syntax": 1
+  },
+  "optimizer_minutes": 2.8,
+  "modification": "Added a deterministic fast path for compiler-diagnosed duplicate ANSI output/reg declarations with identical simple widths.\nIt merges the declarations and returns early only when the patched module passes compilation, avoiding an LLM repair call and full RTL regeneration.\nGeneration and the original two-repair fallback are unchanged; unsupported or unsuccessful edits fall back to the original code and diagnostics."
+ },
+ {
+  "round": 7,
+  "parent": 5,
+  "score": 0.7178,
+  "pass_rate": 0.7212,
+  "avg_tokens": 2208.2,
+  "avg_latency": 75.82,
+  "avg_calls": 1.28,
+  "status": {
+   "pass": 75,
+   "compile": 3,
+   "mismatch": 23,
+   "syntax": 3
+  },
+  "optimizer_minutes": 1.4,
+  "modification": "Changed only the generation prompt to require a concise, concrete behavioral derivation before emitting RTL.\nThe derivation checks cycle timing, FSM transitions, vector index mappings, and supplied table/waveform constraints to target functional errors that compilation cannot detect.\nIt uses the existing single non-thinking generation call with at most 200 words of design notes; sampling settings and compiler-gated repair are unchanged."
+ },
+ {
+  "round": 6,
+  "parent": 5,
+  "score": 0.7847,
+  "pass_rate": 0.7885,
+  "avg_tokens": 2477.5,
+  "avg_latency": 162.54,
+  "avg_calls": 1.94,
+  "status": {
+   "pass": 82,
+   "mismatch": 19,
+   "compile": 1,
+   "syntax": 2
+  },
+  "optimizer_minutes": 2.4,
+  "modification": "Added one reasoning-enabled semantic review after the existing compiler-repair loop.\nOnly a reported issue triggers one revision, which replaces the incumbent only if it compiles; review errors or timeouts retain the incumbent.\nThis targets functional mismatches that compilation cannot detect, while keeping initial generation unchanged and bounding the workflow to 840 seconds."
+ },
+ {
+  "round": 8,
+  "parent": 6,
+  "score": 0.7935,
+  "pass_rate": 0.7981,
+  "avg_tokens": 3082.8,
+  "avg_latency": 205.07,
+  "avg_calls": 1.96,
+  "status": {
+   "pass": 83,
+   "mismatch": 11,
+   "compile": 8,
+   "syntax": 2
+  },
+  "optimizer_minutes": 1.9,
+  "modification": "Fused the reasoning-enabled semantic review and conditional repair into one call returning `LGTM` or complete corrected RTL.\nThis removes a repeated specification/code prompt and a serial LLM call whenever a semantic fix is needed.\nKept generation, compiler repair, compilation-gated revision acceptance, incumbent fallback, and the overall time limit; the fused call uses the prior two calls' combined timeout budget."
+ },
+ {
+  "round": 9,
+  "parent": 4,
+  "score": 0.7697,
+  "pass_rate": 0.7788,
+  "avg_tokens": 6087.8,
+  "avg_latency": 321.22,
+  "avg_calls": 1.69,
+  "status": {
+   "pass": 81,
+   "compile": 12,
+   "mismatch": 10,
+   "syntax": 1
+  },
+  "optimizer_minutes": 2.4,
+  "modification": "Added one reasoning-enabled semantic review after the existing compiler-repair loop; only reported issues trigger a single revision, accepted only if it compiles.\nThis targets functional errors such as cycle timing, transition priorities, and reset values that the parent's compilation gate cannot detect, extending the review mechanism that improved round 6 to round 4's stronger generator.\nEmpty feedback, tool failures, and invalid revisions retain the incumbent; an overall 840-second deadline re"
+ },
+ {
+  "round": 10,
+  "parent": 6,
+  "score": 0.8647,
+  "pass_rate": 0.875,
+  "avg_tokens": 6850.4,
+  "avg_latency": 92.58,
+  "avg_calls": 2.57,
+  "status": {
+   "pass": 91,
+   "mismatch": 9,
+   "compile": 2,
+   "syntax": 2
+  },
+  "optimizer_minutes": 0.1,
+  "modification": "?"
+ },
+ {
+  "round": 11,
+  "parent": 3,
+  "score": 0.823,
+  "pass_rate": 0.8269,
+  "avg_tokens": 2588.0,
+  "avg_latency": 34.29,
+  "avg_calls": 1.44,
+  "status": {
+   "pass": 86,
+   "mismatch": 16,
+   "compile": 1,
+   "syntax": 1
+  },
+  "optimizer_minutes": 2.2,
+  "modification": "Added a compact JSON edit attempt for the first compilation failure in RTL of at least 1,500 characters.\nOnly unique, nonoverlapping local edits that pass compilation are accepted; any failure falls back to the unchanged two full-code repair attempts.\nGeneration and already-compiling candidates are unchanged. Small edit responses should reduce repair decoding tokens and latency without regenerating unrelated RTL."
+ },
+ {
+  "round": 13,
+  "parent": 1,
+  "score": 0.5849,
+  "pass_rate": 0.5865,
+  "avg_tokens": 1094.7,
+  "avg_latency": 24.55,
+  "avg_calls": 1,
+  "status": {
+   "pass": 61,
+   "compile": 24,
+   "mismatch": 14,
+   "syntax": 5
+  },
+  "optimizer_minutes": 0.1,
+  "modification": "?"
+ },
+ {
+  "round": 12,
+  "parent": 11,
+  "score": 0.7569,
+  "pass_rate": 0.7596,
+  "avg_tokens": 1836.2,
+  "avg_latency": 26.16,
+  "avg_calls": 1.37,
+  "status": {
+   "pass": 79,
+   "mismatch": 23,
+   "syntax": 2
+  },
+  "optimizer_minutes": 0.2,
+  "modification": "?"
+ },
+ {
+  "round": 15,
+  "parent": 4,
+  "score": 0.8205,
+  "pass_rate": 0.8269,
+  "avg_tokens": 4303.6,
+  "avg_latency": 101.01,
+  "avg_calls": 1.36,
+  "status": {
+   "pass": 86,
+   "mismatch": 16,
+   "compile": 2
+  },
+  "optimizer_minutes": 0.1,
+  "modification": "?"
+ },
+ {
+  "round": 14,
+  "parent": 4,
+  "score": 0.8879,
+  "pass_rate": 0.8942,
+  "avg_tokens": 4237.4,
+  "avg_latency": 102.09,
+  "avg_calls": 1.34,
+  "status": {
+   "pass": 93,
+   "mismatch": 8,
+   "compile": 2,
+   "syntax": 1
+  },
+  "optimizer_minutes": 0.1,
+  "modification": "?"
+ },
+ {
+  "round": 17,
+  "parent": 10,
+  "score": 0.856,
+  "pass_rate": 0.8654,
+  "avg_tokens": 6226.3,
+  "avg_latency": 87.92,
+  "avg_calls": 2.54,
+  "status": {
+   "pass": 90,
+   "mismatch": 13,
+   "syntax": 1
+  },
+  "optimizer_minutes": 2.7,
+  "modification": "Added an adaptive semantic-review gate for short combinational specifications and RTL with clean compiler/lint reports.\nAn exact LGTM from a non-thinking review skips the expensive reasoning review; concerns, malformed replies, or gate failures fall back to the original review/repair path.\nTemporal/stateful designs retain the original reasoning review, targeting token and latency savings on straightforward logic without weakening those harder cases."
+ },
+ {
+  "round": 16,
+  "parent": 10,
+  "score": 0.8642,
+  "pass_rate": 0.875,
+  "avg_tokens": 7221.4,
+  "avg_latency": 103.23,
+  "avg_calls": 2.54,
+  "status": {
+   "pass": 91,
+   "mismatch": 9,
+   "compile": 2,
+   "syntax": 2
+  },
+  "optimizer_minutes": 7.1,
+  "modification": "Replaced the semantic review checklist with a specification-first, counterexample-based review prompt.\nThe reviewer traces pre/post-edge values, interval boundaries, and sequence overlap, and must support each proposed fix with expected versus actual behavior on legal inputs.\nThis targets cycle-timing errors and speculative repairs while preserving the existing reasoning mode, sampling, repair loop, and compilation gate.\nValidation: syntax/format checks passed; one smoke run on three parent timi"
+ },
+ {
+  "round": 18,
+  "parent": 14,
+  "score": 0.8297,
+  "pass_rate": 0.8365,
+  "avg_tokens": 4561.5,
+  "avg_latency": 93.59,
+  "avg_calls": 1.39,
+  "status": {
+   "pass": 87,
+   "compile": 6,
+   "mismatch": 11
+  },
+  "optimizer_minutes": 2.3,
+  "modification": "Replaced the second compiler-repair attempt with an independent, non-thinking generation when the first repair fails, repeats code, or returns nothing.\nThe restart uses only the specification and is compiled before returning; already-compiling candidates and successful first repairs keep the original path.\nThis breaks anchoring on persistently invalid RTL or unfinished reasoning while preserving the two-attempt LLM budget."
+ },
+ {
+  "round": 19,
+  "parent": 16,
+  "score": 0.8176,
+  "pass_rate": 0.8269,
+  "avg_tokens": 6220.6,
+  "avg_latency": 129.18,
+  "avg_calls": 2.32,
+  "status": {
+   "pass": 86,
+   "mismatch": 16,
+   "compile": 1,
+   "syntax": 1
+  },
+  "optimizer_minutes": 1.2,
+  "modification": "Enabled `think=True` only for the semantic revision call after the reasoning-enabled review reports a problem.\nThis lets the repair model re-derive and check the correction against the specification instead of applying complex functional feedback without reasoning.\nGeneration, compiler repair, review instructions, and compilation-gated acceptance are unchanged; extra reasoning cost is limited to proposed semantic fixes."
+ },
+ {
+  "round": 21,
+  "parent": 10,
+  "score": 0.829,
+  "pass_rate": 0.8365,
+  "avg_tokens": 5003.1,
+  "avg_latency": 123.3,
+  "avg_calls": 2.35,
+  "status": {
+   "pass": 87,
+   "mismatch": 14,
+   "compile": 2,
+   "syntax": 1
+  },
+  "optimizer_minutes": 1.4,
+  "modification": "Added a bounded behavioral adjudication gate after a semantic revision passes compilation.\nThe gate seeks a distinguishing input trace and judges its outputs against the specification, independently of the review feedback; only an explicit preference for the original rejects the revision.\nEquivalent, inconclusive, or failed checks preserve the parent's revision acceptance behavior. This targets functional regressions that compilation alone cannot detect, with extra LLM work confined to distingui"
+ },
+ {
+  "round": 20,
+  "parent": 16,
+  "score": 0.8284,
+  "pass_rate": 0.8365,
+  "avg_tokens": 5422.9,
+  "avg_latency": 113.63,
+  "avg_calls": 2.29,
+  "status": {
+   "pass": 87,
+   "mismatch": 13,
+   "compile": 1,
+   "syntax": 3
+  },
+  "optimizer_minutes": 1.9,
+  "modification": "Fused semantic review with compact exact-match repair edits, retaining the specification-first counterexample checks.\nUnique, nonoverlapping edits are applied to the reviewed RTL and accepted only after compilation; malformed or failing edits use the original repair path.\nSuccessful edits eliminate a serial repair call and its repeated specification/RTL prompt and full-module output, targeting lower tokens and latency without skipping review."
+ },
+ {
+  "round": 22,
+  "parent": 14,
+  "score": 0.849,
+  "pass_rate": 0.8558,
+  "avg_tokens": 4545.1,
+  "avg_latency": 93.18,
+  "avg_calls": 1.45,
+  "status": {
+   "pass": 89,
+   "mismatch": 13,
+   "compile": 1,
+   "syntax": 1
+  },
+  "optimizer_minutes": 5.0,
+  "modification": "Added a waveform-specific generation prompt that separates pre-edge sampling from same-row combinational behavior and checks one timing interpretation against the full trace.\nThis targets spurious pipeline stages and prolonged contradictory waveform reasoning without hardcoding circuit equations or benchmark identities.\nOnly specifications mentioning waveforms receive the guidance; sampling settings, reasoning mode, and compiler repair remain unchanged.\nValidation: Python syntax checks passed; t"
+ },
+ {
+  "round": 23,
+  "parent": 17,
+  "score": 0.8445,
+  "pass_rate": 0.8558,
+  "avg_tokens": 7524.7,
+  "avg_latency": 129.58,
+  "avg_calls": 2.68,
+  "status": {
+   "pass": 89,
+   "mismatch": 13,
+   "compile": 1,
+   "syntax": 1
+  },
+  "optimizer_minutes": 1.9,
+  "modification": "Fused the reasoning-enabled semantic review and repair into one call returning `LGTM` or complete corrected RTL.\nAccept corrections only after compilation; malformed, truncated, failing, or unavailable replies fall back to the parent's review/repair path.\nThis removes a serial repair call and repeated specification/code/feedback tokens when correction succeeds, while retaining the existing cheap combinational gate.\nUses complete RTL rather than the fragile exact-match edit protocol tried in roun"
+ },
+ {
+  "round": 24,
+  "parent": 14,
+  "score": 0.8679,
+  "pass_rate": 0.875,
+  "avg_tokens": 4754.1,
+  "avg_latency": 107.55,
+  "avg_calls": 1.45,
+  "status": {
+   "pass": 91,
+   "mismatch": 11,
+   "syntax": 2
+  },
+  "optimizer_minutes": 2.9,
+  "modification": "Escalate the second compiler repair to reasoning mode when the first repair does not yield compiling RTL.\nEmpty or repeated first revisions now reach that final attempt instead of ending the loop; the limit remains two repairs, with compilation checked after each new revision.\nThis targets persistent compiler failures using the current RTL and actual diagnostics, while preserving initial generation and the fast path for compiling candidates."
+ },
+ {
+  "round": 25,
+  "parent": 10,
+  "score": 0.8446,
+  "pass_rate": 0.8558,
+  "avg_tokens": 7448.3,
+  "avg_latency": 169.69,
+  "avg_calls": 3.24,
+  "status": {
+   "pass": 89,
+   "syntax": 2,
+   "mismatch": 13
+  },
+  "optimizer_minutes": 1.6,
+  "modification": "Added a specification-only, reasoning-enabled behavioral planning call before RTL generation, capped at 3,072 completion tokens and 120 seconds.\nThe compact plan derives state recurrences, output timing, and sequence boundaries independently of candidate code, targeting functional errors that code-anchored review can miss.\nOnly complete plans are passed as advisory generation context; failed or truncated planning falls back to the parent generation path. Compiler repair and semantic review are u"
+ },
+ {
+  "round": 26,
+  "parent": 1,
+  "score": 0.6135,
+  "pass_rate": 0.6154,
+  "avg_tokens": 1248.0,
+  "avg_latency": 22.73,
+  "avg_calls": 1.12,
+  "status": {
+   "pass": 64,
+   "compile": 23,
+   "mismatch": 13,
+   "syntax": 4
+  },
+  "optimizer_minutes": 2.6,
+  "modification": "Added adaptive completion budgets: 1,536 tokens for the unchanged initial request, with one 3,072-token continuation only when a structural check finds incomplete RTL.\nThe continuation reuses the partial reasoning and requests a complete implementation; complete initial candidates keep the original one-call path.\nThis caps runaway explanation tails at 4,608 completion tokens across both calls, versus the parent's 6,144-token single-call limit, while giving unfinished responses a recovery path."
+ },
+ {
+  "round": 27,
+  "parent": 10,
+  "score": 0.875,
+  "pass_rate": 0.8846,
+  "avg_tokens": 6381.2,
+  "avg_latency": 102.45,
+  "avg_calls": 2.47,
+  "status": {
+   "pass": 92,
+   "mismatch": 12
+  },
+  "optimizer_minutes": 1.6,
+  "modification": "Added one bounded, reasoning-enabled fresh generation when the existing compiler-repair stage still leaves invalid RTL; accept it only after successful compilation.\nThe restart derives from the specification alone, avoiding continued edits to a broken implementation, and returns immediately on success.\nUnlike round 18, both original repair opportunities remain and the restart uses reasoning; already-compiling paths are unchanged.\nThis targets residual compile/syntax failures while charging extra"
+ },
+ {
+  "round": 28,
+  "parent": 10,
+  "score": 0.874,
+  "pass_rate": 0.8846,
+  "avg_tokens": 7095.4,
+  "avg_latency": 101.7,
+  "avg_calls": 2.59,
+  "status": {
+   "pass": 92,
+   "mismatch": 11,
+   "syntax": 1
+  },
+  "optimizer_minutes": 0.1,
+  "modification": "?"
+ },
+ {
+  "round": 29,
+  "parent": 27,
+  "score": 0.8162,
+  "pass_rate": 0.8269,
+  "avg_tokens": 7152.6,
+  "avg_latency": 113.91,
+  "avg_calls": 2.63,
+  "status": {
+   "pass": 86,
+   "mismatch": 16,
+   "compile": 2
+  },
+  "optimizer_minutes": 2.7,
+  "modification": "Added an exhaustive-agreement early exit before reasoning review for warning-free, continuous-assignment circuits with at most eight input bits.\nA bounded non-thinking call independently implements the specification; review is skipped only when both interfaces match and simulations agree on every input combination with fully known outputs.\nDisagreement, incomplete output, unsupported RTL, and checker failures retain the parent's review/repair path, targeting review tokens and latency without rel"
+ },
+ {
+  "round": 31,
+  "parent": 24,
+  "score": 0.8772,
+  "pass_rate": 0.8846,
+  "avg_tokens": 4943.4,
+  "avg_latency": 120.49,
+  "avg_calls": 1.43,
+  "status": {
+   "pass": 92,
+   "mismatch": 7,
+   "syntax": 4,
+   "compile": 1
+  },
+  "optimizer_minutes": 1.3,
+  "modification": "Changed only the generation prompt to require table-first Boolean derivation and a final check of every specified care row.\nThe guidance preserves Karnaugh-map labels, uses direct logic when minimization is unnecessary, and distinguishes SOP/POS grouping and literal polarity when minimum forms are required.\nThis targets functional errors from incorrect simplification within the existing reasoning call, without adding samples or model calls."
+ },
+ {
+  "round": 30,
+  "parent": 27,
+  "score": 0.8336,
+  "pass_rate": 0.8462,
+  "avg_tokens": 8367.9,
+  "avg_latency": 192.56,
+  "avg_calls": 3.31,
+  "status": {
+   "pass": 88,
+   "mismatch": 14,
+   "compile": 2
+  },
+  "optimizer_minutes": 2.7,
+  "modification": "Added one bounded, non-thinking, specification-derived self-test before semantic review of compiling RTL.\nConcrete simulation mismatches route to a reasoning review that checks both RTL and testbench; passing, inconclusive, or unavailable tests keep the original review path.\nThis supplies executable behavioral evidence for timing and logic errors that compilation and code-only review can miss, while retaining compilation-gated repair acceptance."
+ }
+]

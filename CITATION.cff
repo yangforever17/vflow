@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the VFlow paper below."
+title: "Vflow: Discovering Optimal Agentic Workflows for Verilog Generation"
+repository-code: "https://github.com/yangforever17/vflow"
+preferred-citation:
+  type: article
+  title: "VFlow: Discovering Optimal Agentic Workflows for Verilog Generation"
+  authors:
+    - family-names: Wei
+      given-names: Yangbo
+    - family-names: Huang
+      given-names: Zhen
+    - family-names: Li
+      given-names: Huang
+    - family-names: Xing
+      given-names: Wei W.
+    - family-names: Lin
+      given-names: Ting-Jung
+    - family-names: He
+      given-names: Lei
+  journal: "arXiv preprint arXiv:2504.03723"
+  year: 2025
+  url: "https://arxiv.org/abs/2504.03723"
+  identifiers:
+    - type: other
+      value: "arXiv:2504.03723"
