@@ -12,7 +12,7 @@
 
 </div>
 
-Vflow 让编程 agent 反复改写 LLM workflow，保留用更少 token 写出更多正确 Verilog 的版本。
+论文 [VFlow (arXiv:2504.03723v1)](https://arxiv.org/abs/2504.03723v1) 的实现。Vflow 让编程 agent 反复改写 LLM workflow，保留用更少 token 写出更多正确 Verilog 的版本。
 
 ---
 

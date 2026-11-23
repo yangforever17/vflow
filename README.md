@@ -12,7 +12,7 @@
 
 </div>
 
-Vflow lets a coding agent repeatedly rewrite an LLM workflow and keeps the versions that write more correct Verilog for fewer tokens.
+An implementation of [VFlow (arXiv:2504.03723v1)](https://arxiv.org/abs/2504.03723v1). Vflow lets a coding agent repeatedly rewrite an LLM workflow and keeps the versions that write more correct Verilog for fewer tokens.
 
 ---
 
