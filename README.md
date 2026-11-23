@@ -1,8 +1,18 @@
-# Vflow: Discovering Optimal Agentic Workflows for Verilog Generation
+<div align="center">
+
+# Vflow
+
+**Discovering Optimal Agentic Workflows for Verilog Generation**
+
+[![arXiv](https://img.shields.io/badge/arXiv-2504.03723-b31b1b.svg)](https://arxiv.org/abs/2504.03723)
+[![Python](https://img.shields.io/badge/Python-3.12-3776ab.svg)](requirements.txt)
+[![Benchmark](https://img.shields.io/badge/Benchmark-VerilogEval--v2-2ea44f.svg)](https://github.com/NVlabs/verilog-eval)
 
 **English** | [中文](README_zh.md)
 
-An implementation of [VFlow (arXiv:2504.03723v1)](https://arxiv.org/abs/2504.03723v1). If you find this project useful, please cite the paper (see [Section 9](#9-citation)).
+</div>
+
+Vflow lets a coding agent repeatedly rewrite an LLM workflow and keeps the versions that write more correct Verilog for fewer tokens.
 
 ---
 
